@@ -2,176 +2,189 @@ package leibooks.domain.core;
 
 import java.io.File;
 import java.time.LocalDate;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.TreeMap;
+import java.util.*;
 
 import leibooks.domain.facade.IDocument;
-import leibooks.domain.facade.events.AddAnnotationEvent;
-import leibooks.domain.facade.events.DocumentEvent;
-import leibooks.domain.facade.events.RemoveAnnotationEvent;
-import leibooks.domain.facade.events.ToggleBookmarkEvent;
+import leibooks.domain.facade.events.*;
 import leibooks.utils.AbsSubject;
-import leibooks.utils.Listener;
+import leibooks.utils.RegExpMatchable;
 
-public class Document implements IDocument {
+public class Document extends AbsSubject<DocumentEvent> implements IDocument, RegExpMatchable {
 
-	public Document(String expectedTitle, String expectedAuthor, LocalDate expectedModifiedDate,
-			String expectedMimeType, String expectedPath, Optional<Integer> expectedNumPages) {
-		// TODO Auto-generated constructor stub
-	}
+	private String title;
+	private String author;
+	private final String mimeType;
+	private final LocalDate modifiedDate;
+	private final File file;
+	private final Optional<Integer> numPages;
+	private int lastPageVisited;
+	private final Map<Integer, Page> pages = new TreeMap<>();
 
-	@Override
-	public void emitEvent(DocumentEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
+	public Document(String title, String author, LocalDate modifiedDate,
+					String mimeType, String pathToFile, Optional<Integer> numPages) {
+		this.title = title;
+		this.author = author;
+		this.modifiedDate = modifiedDate;
+		this.mimeType = mimeType;
+		this.file = new File(pathToFile);
+		this.numPages = numPages;
 
-	@Override
-	public void registerListener(Listener<DocumentEvent> obs) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void unregisterListener(Listener<DocumentEvent> obs) {
-		// TODO Auto-generated method stub
-		
+		if (numPages.isPresent()) {
+			for (int i = 1; i <= numPages.get(); i++) {
+				pages.put(i, new Page(i));
+			}
+		}
 	}
 
 	@Override
 	public File getFile() {
-		// TODO Auto-generated method stub
-		return null;
+		return file;
 	}
 
 	@Override
 	public String getTitle() {
-		// TODO Auto-generated method stub
-		return null;
+		return title;
 	}
 
 	@Override
 	public String getAuthor() {
-		// TODO Auto-generated method stub
-		return null;
+		return author;
 	}
 
 	@Override
 	public String getMimeType() {
-		// TODO Auto-generated method stub
-		return null;
+		return mimeType;
 	}
 
 	@Override
 	public LocalDate getLastModifiedDate() {
-		// TODO Auto-generated method stub
-		return null;
+		return modifiedDate;
 	}
 
 	@Override
 	public Optional<Integer> getNumberOfPages() {
-		// TODO Auto-generated method stub
-		return Optional.empty();
+		return numPages;
 	}
 
 	@Override
 	public int getLastPageVisited() {
-		// TODO Auto-generated method stub
-		return 0;
+		return lastPageVisited;
 	}
 
 	@Override
 	public List<Integer> getBookmarks() {
-		// TODO Auto-generated method stub
-		return null;
+		List<Integer> bookmarks = new ArrayList<>();
+		for (Page p : pages.values()) {
+			if (p.isBookmarked()) {
+				bookmarks.add(p.getPageNum());
+			}
+		}
+		return bookmarks;
 	}
 
 	@Override
 	public void toggleBookmark(int pageNum) {
-		// TODO Auto-generated method stub
-		
+		Page page = pages.get(pageNum);
+		if (page != null) {
+			page.toggleBookmark();
+			emitEvent(new ToggleBookmarkEvent(this, pageNum));
+		}
 	}
 
 	@Override
 	public void setTitle(String title) {
-		// TODO Auto-generated method stub
-		
+		this.title = title;
+		emitEvent(new UpdateDocumentPropertiesEvent(this));
 	}
 
 	@Override
 	public void setAuthor(String author) {
-		// TODO Auto-generated method stub
-		
+		this.author = author;
+		emitEvent(new UpdateDocumentPropertiesEvent(this));
 	}
 
 	@Override
 	public void setLastPageVisited(int lastPageVisited) {
-		// TODO Auto-generated method stub
-		
+		this.lastPageVisited = lastPageVisited;
 	}
 
 	@Override
 	public void addAnnotation(int pageNum, String text) {
-		// TODO Auto-generated method stub
-		
+		Page page = pages.get(pageNum);
+		if (page != null) {
+			page.addAnnotation(text);
+			emitEvent(new AddAnnotationEvent(this, pageNum));
+		}
 	}
 
 	@Override
 	public void removeAnnotation(int pageNum, int annotNum) {
-		// TODO Auto-generated method stub
-		
+		Page page = pages.get(pageNum);
+		if (page != null) {
+			page.removeAnnotation(annotNum);
+			emitEvent(new RemoveAnnotationEvent(this, pageNum, annotNum));
+		}
 	}
 
 	@Override
 	public int numberOfAnnotations(int pageNum) {
-		// TODO Auto-generated method stub
-		return 0;
+		Page page = pages.get(pageNum);
+		return (page != null) ? page.getAnnotationCount() : 0;
 	}
 
 	@Override
 	public Iterable<String> getAnnotations(int pageNum) {
-		// TODO Auto-generated method stub
-		return null;
+		Page page = pages.get(pageNum);
+		if (page == null) return Collections.emptyList();
+		List<String> list = new ArrayList<>();
+		for (Annotation a : page.getAnnotations()) {
+			list.add(a.getAnnotationText());
+		}
+		return list;
 	}
 
 	@Override
 	public String getAnnotationText(int pageNum, int annotNum) {
-		// TODO Auto-generated method stub
-		return null;
+		Page page = pages.get(pageNum);
+		return (page != null) ? page.getAnnotationText(annotNum) : null;
 	}
 
 	@Override
 	public boolean hasAnnotations(int pageNum) {
-		// TODO Auto-generated method stub
-		return false;
+		Page page = pages.get(pageNum);
+		return page != null && page.hasAnnotations();
 	}
 
 	@Override
 	public boolean isBookmarked(int pageNum) {
-		// TODO Auto-generated method stub
-		return false;
+		Page page = pages.get(pageNum);
+		return page != null && page.isBookmarked();
 	}
 
 	@Override
 	public boolean isBookmarked() {
-		// TODO Auto-generated method stub
-		return false;
+		return getBookmarks().size() > 0;
 	}
 
 	@Override
 	public boolean matches(String regexp) {
-		// TODO Auto-generated method stub
-		return false;
+		return title.matches(regexp) || author.matches(regexp);
 	}
 
 	@Override
 	public int compareTo(IDocument other) {
-		// TODO Auto-generated method stub
-		return 0;
+		return this.file.compareTo(other.getFile());
 	}
 
+	@Override
+	public boolean equals(Object o) {
+		if (!(o instanceof IDocument)) return false;
+		IDocument other = (IDocument) o;
+		return this.file.equals(other.getFile());
+	}
 
+	@Override
+	public int hashCode() {
+		return file.hashCode();
+	}
 }
