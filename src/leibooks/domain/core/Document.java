@@ -87,20 +87,18 @@ public class Document extends AbsSubject<DocumentEvent> implements IDocument, Re
 		Page page = pages.get(pageNum);
 		if (page != null) {
 			page.toggleBookmark();
-			emitEvent(new ToggleBookmarkEvent(this, pageNum));
+			emitEvent(new ToggleBookmarkEvent(this, pageNum, page.isBookmarked()));
 		}
 	}
 
 	@Override
 	public void setTitle(String title) {
 		this.title = title;
-		emitEvent(new UpdateDocumentPropertiesEvent(this));
 	}
 
 	@Override
 	public void setAuthor(String author) {
 		this.author = author;
-		emitEvent(new UpdateDocumentPropertiesEvent(this));
 	}
 
 	@Override
@@ -113,7 +111,8 @@ public class Document extends AbsSubject<DocumentEvent> implements IDocument, Re
 		Page page = pages.get(pageNum);
 		if (page != null) {
 			page.addAnnotation(text);
-			emitEvent(new AddAnnotationEvent(this, pageNum));
+			int annotationNum = page.getAnnotationCount(); // última adicionada
+			emitEvent(new AddAnnotationEvent(this, pageNum, annotationNum, text, page.hasAnnotations()));
 		}
 	}
 
@@ -122,7 +121,7 @@ public class Document extends AbsSubject<DocumentEvent> implements IDocument, Re
 		Page page = pages.get(pageNum);
 		if (page != null) {
 			page.removeAnnotation(annotNum);
-			emitEvent(new RemoveAnnotationEvent(this, pageNum, annotNum));
+			emitEvent(new RemoveAnnotationEvent(this, pageNum, annotNum, page.hasAnnotations()));
 		}
 	}
 
@@ -163,7 +162,7 @@ public class Document extends AbsSubject<DocumentEvent> implements IDocument, Re
 
 	@Override
 	public boolean isBookmarked() {
-		return getBookmarks().size() > 0;
+		return !getBookmarks().isEmpty();
 	}
 
 	@Override
