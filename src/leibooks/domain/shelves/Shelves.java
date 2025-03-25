@@ -9,6 +9,7 @@ import leibooks.domain.core.ILibrary;
 import leibooks.domain.facade.IDocument;
 import leibooks.domain.facade.events.*;
 import leibooks.utils.AbsSubject;
+import leibooks.utils.UnRemovable;
 
 public class Shelves extends AbsSubject<ShelfEvent> implements IShelves {
 
@@ -29,7 +30,7 @@ public class Shelves extends AbsSubject<ShelfEvent> implements IShelves {
 		if (shelfMap.containsKey(shelfName)) return false;
 		IShelf shelf = new NormalShelf(shelfName);
 		shelfMap.put(shelfName, shelf);
-		emitEvent(new AddShelfEvent(shelf));
+		emitEvent(new AddShelfEvent(shelf.getName()));
 		return true;
 	}
 
@@ -38,7 +39,7 @@ public class Shelves extends AbsSubject<ShelfEvent> implements IShelves {
 		if (shelfMap.containsKey(shelfName)) return false;
 		IShelf shelf = new SmartShelf(shelfName, library, criteria);
 		shelfMap.put(shelfName, shelf);
-		emitEvent(new AddShelfEvent(shelf));
+		emitEvent(new AddShelfEvent(shelf.getName()));
 		return true;
 	}
 
@@ -50,14 +51,14 @@ public class Shelves extends AbsSubject<ShelfEvent> implements IShelves {
 			throw new OperationNotSupportedException("This shelf is unremovable.");
 		}
 		shelfMap.remove(shelfName);
-		emitEvent(new RemoveShelfEvent(shelf));
+		emitEvent(new RemoveShelfEvent(shelf.getName()));
 	}
 
 	@Override
 	public void removeDocument(String shelfName, IDocument document) throws OperationNotSupportedException {
 		IShelf shelf = shelfMap.get(shelfName);
 		if (shelf != null && shelf.removeDocument(document)) {
-			emitEvent(new RemoveDocumentShelfEvent(shelf, document));
+			emitEvent(new RemoveDocumentShelfEvent(shelf.getName(), document));
 		}
 	}
 
