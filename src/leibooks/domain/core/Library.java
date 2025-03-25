@@ -8,11 +8,10 @@ import leibooks.domain.facade.IDocument;
 import leibooks.domain.facade.events.AddDocumentEvent;
 import leibooks.domain.facade.events.DocumentEvent;
 import leibooks.domain.facade.events.RemoveDocumentEvent;
-import leibooks.domain.facade.events.UpdateDocumentPropertiesEvent;
 import leibooks.utils.AbsSubject;
 import leibooks.utils.Listener;
 
-public class Library extends AbsSubject<DocumentEvent> implements ILibrary {
+public class Library extends AbsSubject<DocumentEvent> implements ILibrary, Listener<DocumentEvent> {
 
 	private final Set<IDocument> documents = new TreeSet<>();
 
@@ -30,7 +29,7 @@ public class Library extends AbsSubject<DocumentEvent> implements ILibrary {
 	public boolean addDocument(IDocument document) {
 		boolean added = documents.add(document);
 		if (added) {
-			document.registerListener(this); // React to document events
+			document.registerListener(this); // agora Library implementa Listener<DocumentEvent>
 			emitEvent(new AddDocumentEvent(document));
 		}
 		return added;
@@ -46,9 +45,9 @@ public class Library extends AbsSubject<DocumentEvent> implements ILibrary {
 
 	@Override
 	public void updateDocument(IDocument document, DocumentProperties properties) {
-		document.setTitle(properties.getTitle());
-		document.setAuthor(properties.getAuthor());
-		emitEvent(new UpdateDocumentPropertiesEvent(document));
+		document.setTitle(properties.title());     // método corrigido
+		document.setAuthor(properties.author());   // método corrigido
+		// Removido: emitEvent(new UpdateDocumentPropertiesEvent(document));
 	}
 
 	@Override
@@ -65,6 +64,6 @@ public class Library extends AbsSubject<DocumentEvent> implements ILibrary {
 
 	@Override
 	public void processEvent(DocumentEvent event) {
-		emitEvent(event); // Propaga eventos dos documentos
+		emitEvent(event); // propaga eventos recebidos dos documentos
 	}
 }
