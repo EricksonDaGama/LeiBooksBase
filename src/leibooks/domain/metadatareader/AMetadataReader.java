@@ -2,6 +2,7 @@ package leibooks.domain.metadatareader;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Optional;
@@ -19,8 +20,9 @@ public abstract class AMetadataReader implements IMetadataReader {
             throw new FileNotFoundException("File not found: " + pathToDocFile);
         }
 
-        this.modifiedDate = LocalDate.ofInstant(file.lastModified() > 0 ?
-                file.toInstant() : new java.util.Date().toInstant(), ZoneId.systemDefault());
+        this.modifiedDate = Instant.ofEpochMilli(file.lastModified())
+                .atZone(ZoneId.systemDefault())
+                .toLocalDate();
 
         this.mimeType = guessMimeType(file);
     }
