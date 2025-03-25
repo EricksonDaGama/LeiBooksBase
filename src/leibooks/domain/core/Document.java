@@ -186,4 +186,20 @@ public class Document extends AbsSubject<DocumentEvent> implements IDocument, Re
 	public int hashCode() {
 		return file.hashCode();
 	}
+
+
+	@Override
+	public String toString() {
+		return "Document{" +
+				"title=" + title +
+				", author=" + author +
+				", file=" + file.getPath() +
+				", date=" + modifiedDate +
+				", mimeType=" + mimeType +
+				", numPages=" + numPages +
+				", lastPageVisited=" + lastPageVisited +
+				", pages=" + pages +
+				'}';
+	}
+
 }
