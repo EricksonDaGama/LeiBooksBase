@@ -66,4 +66,14 @@ public class Library extends AbsSubject<DocumentEvent> implements ILibrary, List
 	public void processEvent(DocumentEvent event) {
 		emitEvent(event); // propaga eventos recebidos dos documentos
 	}
+
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder("Library =\n");
+		for (IDocument doc : documents) {
+			sb.append(doc.toString()).append("\n");
+		}
+		return sb.toString();
+	}
+
 }

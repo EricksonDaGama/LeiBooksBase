@@ -50,4 +50,16 @@ public class Page {
     public String getAnnotationText(int index) {
         return annotations.get(index).getAnnotationText();
     }
+
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Page{bookmark=").append(bookmarked);
+        sb.append(", annotations=").append(annotations);
+        sb.append(", pageNum=").append(pageNum);
+        sb.append("}");
+        return sb.toString();
+    }
+
 }

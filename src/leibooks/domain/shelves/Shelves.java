@@ -76,4 +76,15 @@ public class Shelves extends AbsSubject<ShelfEvent> implements IShelves {
 		IShelf shelf = shelfMap.get(shelfName);
 		return (shelf != null) ? shelf : Collections.emptyList();
 	}
+
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder("Shelves=\n");
+		for (Map.Entry<String, IShelf> entry : shelfMap.entrySet()) {
+			sb.append(entry.getKey()).append(" = ").append(entry.getValue()).append("\n");
+		}
+		return sb.toString();
+	}
+
+
 }
