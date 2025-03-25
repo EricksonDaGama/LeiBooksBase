@@ -90,4 +90,10 @@ public enum MetadataReaderFactory {
 
         return mime.toString(); // Exemplo: PdfDoc → pdf/doc
     }
+
+    // ✅ Adicionado para resolver impressão no SimpleClient
+    @Override
+    public String toString() {
+        return mimeReaderMap.toString();
+    }
 }
