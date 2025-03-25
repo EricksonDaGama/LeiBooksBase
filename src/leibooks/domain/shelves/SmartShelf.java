@@ -1,6 +1,8 @@
 package leibooks.domain.shelves;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.function.Predicate;
 
 import javax.naming.OperationNotSupportedException;
@@ -22,21 +24,27 @@ public class SmartShelf extends AShelf {
 
     @Override
     public Iterator<IDocument> iterator() {
-        return library.getMatches(criteria).iterator();
+        List<IDocument> filtered = new ArrayList<>();
+        for (IDocument doc : library) {
+            if (criteria.test(doc)) {
+                filtered.add(doc);
+            }
+        }
+        return filtered.iterator();
     }
 
     @Override
     public boolean addDocument(IDocument document) throws OperationNotSupportedException {
-        throw new OperationNotSupportedException("Cannot manually add documents to smart shelf.");
+        throw new OperationNotSupportedException("Cannot manually add documents to a smart shelf.");
     }
 
     @Override
     public boolean removeDocument(IDocument document) throws OperationNotSupportedException {
-        throw new OperationNotSupportedException("Cannot manually remove documents from smart shelf.");
+        throw new OperationNotSupportedException("Cannot manually remove documents from a smart shelf.");
     }
 
     @Override
     public void processEvent(DocumentEvent e) {
-        // Pode ser usada no futuro para atualizações dinâmicas
+        // SmartShelf could react to document events if needed
     }
 }
