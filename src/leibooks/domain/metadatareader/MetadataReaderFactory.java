@@ -12,7 +12,12 @@ public enum MetadataReaderFactory {
 
     private final Map<String, Class<? extends IMetadataReader>> mimeReaderMap = new HashMap<>();
 
-    private final String EXT_READER_PATH = "viewers_readers/metadatareader"; // pasta configurável se necessário
+    //private final String EXT_READER_PATH = "viewers_readers/metadatareader"; // pasta configurável se necessário
+    //private final String EXT_READER_PATH = AppProperties.INSTANCE.FOLDER_EXTRA_VIEWERS_AND_READERS;
+    private final String EXT_READER_PATH = "viewers_readers";
+
+
+
 
     MetadataReaderFactory() {
         // Registra o leitor padrão para PDF
@@ -91,7 +96,7 @@ public enum MetadataReaderFactory {
         return mime.toString(); // Exemplo: PdfDoc → pdf/doc
     }
 
-    // ✅ Adicionado para resolver impressão no SimpleClient
+    // Adicionado para resolver impressão no SimpleClient
     @Override
     public String toString() {
         return mimeReaderMap.toString();
